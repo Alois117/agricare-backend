@@ -1,0 +1,9 @@
+Flask
+flask-cors
+python-dotenv
+numpy
+opencv-python
+tensorflow
+requests
+Pillow
+Werkzeug
