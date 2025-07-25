@@ -101,7 +101,7 @@ def get_plant_id_prediction(image_path):
         print(f"API Call Failed: {str(e)}")
         return None
 
-def get_treatment_from_plantid(access_token):
+def get_treatment_from_plantid(access_token, disease_name_fallback="Unknown Disease"):
     try:
         details_url = f"{PLANT_ID_API_URL}/{access_token}?details=local_name,description,treatment"
         response = requests.get(
@@ -115,6 +115,8 @@ def get_treatment_from_plantid(access_token):
                 disease = details['result']['disease']
                 treatment = disease.get('treatment', {})
                 return {
+                    "disease_name": disease.get("name", disease_name_fallback),
+                    "scientific_name": disease.get("scientific_name", "Unknown"),
                     "organic_treatment": treatment.get('organic', ['Not specified'])[0],
                     "chemical_treatment": treatment.get('chemical', ['Not specified'])[0],
                     "prevention": treatment.get('prevention', ['Not specified'])[0],
@@ -189,7 +191,11 @@ def predict():
         )
 
         if source.startswith("plantid"):
-            treatment = get_treatment_from_plantid(plantid_response['access_token']) or get_treatment(best_disease)
+            treatment = get_treatment_from_plantid(
+    plantid_response['access_token'],
+    disease_name_fallback=best_disease
+) or get_treatment(best_disease)
+
         else:
             treatment = get_treatment(best_disease)
 
